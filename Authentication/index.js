@@ -1,14 +1,5 @@
-var firebaseConfig = {
-    apiKey: "AIzaSyCiccwJxhwyelAmdSMO5x6F2KHFo1dGG_A",
-    authDomain: "video-chat-app-a6454.firebaseapp.com",
-    projectId: "video-chat-app-a6454",
-    storageBucket: "video-chat-app-a6454.appspot.com",
-    messagingSenderId: "604116491705",
-    appId: "1:604116491705:web:038d684738df7b81882a68",
-    databaseURL: "https://video-chat-app-a6454-default-rtdb.asia-southeast1.firebasedatabase.app" 
-  };
 
-  firebase.initializeApp(firebaseConfig);
+firebase.initializeApp(firebaseConfig);
 
   const auth = firebase.auth()
   const database = firebase.database()
