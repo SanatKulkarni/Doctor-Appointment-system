@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Prescription Generator</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>Prescription Generator</h1>
+    <div id="medicineInputs">
+        <label for="medicine">Medicine Details:</label>
+        <input type="text" id="medicine" placeholder="Enter medicine details"><br><br>
+        <label for="duration">Duration (in days):</label>
+        <input type="number" id="duration" min="1" placeholder="Enter duration"><br><br>
+        <label>Timings:</label><br>
+        <label><input type="checkbox" class="timing" value="morning"> Morning</label>
+        <label><input type="checkbox" class="timing" value="afternoon"> Afternoon</label>
+        <label><input type="checkbox" class="timing" value="evening"> Evening</label>
+        <label><input type="checkbox" class="timing" value="night"> Night</label><br><br>
+    </div>
+    <button onclick="addMedicine()">Add Medicine</button><br><br>
+    <label for="note">Note to Patient:</label>
+    <textarea id="note" rows="4" placeholder="Enter note to patient"></textarea><br><br>
+    <button onclick="generatePrescription()">Generate Prescription</button><br><br>
+    <table id="addedMedicines">
+        <thead>
+            <tr>
+                <th>Medicine Details</th>
+                <th>Duration</th>
+                <th>Timings</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+    <br>
+    <br>
+    <br>
+    <canvas id="prescription"></canvas>
+
+    <script>
+        const medicines = [];
+
+        function addMedicine() {
+            const medicineInput = document.getElementById('medicine').value;
+            const durationInput = document.getElementById('duration').value;
+            const timingInputs = document.querySelectorAll('.timing:checked');
+            const timings = Array.from(timingInputs).map(input => input.value);
+
+            if (!medicineInput || !durationInput || timings.length === 0) {
+                alert('Please enter all required fields for the medicine.');
+                return;
+            }
+
+            const medicine = {
+                details: medicineInput,
+                duration: durationInput,
+                timings: timings
+            };
+
+            medicines.push(medicine);
+
+            displayAddedMedicines();
+            clearMedicineInputs();
+        }
+
+        function clearMedicineInputs() {
+            document.getElementById('medicine').value = '';
+            document.getElementById('duration').value = '';
+            document.querySelectorAll('.timing').forEach(input => input.checked = false);
+        }
+
+        function displayAddedMedicines() {
+            const tableBody = document.querySelector('#addedMedicines tbody');
+            tableBody.innerHTML = '';
+
+            medicines.forEach((medicine, index) => {
+                const row = document.createElement('tr');
+
+                const detailsCell = document.createElement('td');
+                detailsCell.textContent = medicine.details;
+                row.appendChild(detailsCell);
+
+                const durationCell = document.createElement('td');
+                durationCell.textContent = `${medicine.duration} days`;
+                row.appendChild(durationCell);
+
+                const timingsCell = document.createElement('td');
+                timingsCell.textContent = medicine.timings.join(', ');
+                row.appendChild(timingsCell);
+
+                const actionCell = document.createElement('td');
+                const deleteButton = document.createElement('button');
+                deleteButton.textContent = 'Delete';
+                deleteButton.onclick = () => deleteMedicine(index);
+                actionCell.appendChild(deleteButton);
+                row.appendChild(actionCell);
+
+                tableBody.appendChild(row);
+            });
+        }
+
+        function deleteMedicine(index) {
+            medicines.splice(index, 1);
+            displayAddedMedicines();
+        }
+
+        function generatePrescription() {
+            const noteInput = document.getElementById('note').value;
+
+            if (medicines.length === 0 || !noteInput) {
+                alert('Please add at least one medicine and enter a note to patient.');
+                return;
+            }
+
+            const canvas = document.getElementById('prescription');
+            const ctx = canvas.getContext('2d');
+
+            // Set canvas dimensions
+            canvas.width = 800;
+            canvas.height = 600;
+
+            // Clear canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Draw prescription content
+            ctx.font = '24px Arial';
+            ctx.fillText('Prescription', 20, 40);
+
+            ctx.font = '18px Arial';
+            ctx.fillText('Medicines:', 20, 80);
+
+            let y = 100;
+            const tableWidth = canvas.width - 40;
+            const columnWidths = [200, 100, 200];
+            const totalWidth = columnWidths.reduce((sum, width) => sum + width, 0);
+
+            ctx.font = 'bold 16px Arial';
+            ctx.fillText('Medicine Details', 20, y);
+            ctx.fillText('Duration', 220, y);
+            ctx.fillText('Timings', 320, y);
+            y += 20;
+
+            medicines.forEach(medicine => {
+                ctx.font = '16px Arial';
+                wrapText(ctx, medicine.details, 20, y, columnWidths[0], 18);
+                ctx.fillText(`${medicine.duration} days`, 220, y);
+
+                const timingsText = medicine.timings.join(', ');
+                wrapText(ctx, timingsText, 320, y, columnWidths[2], 18);
+                y += 40;
+            });
+
+            ctx.font = '18px Arial';
+            ctx.fillText('Note to Patient:', 20, y + 40);
+            ctx.font = '16px Arial';
+            wrapText(ctx, noteInput, 20, y + 60, canvas.width - 40, 18);
+        }
+
+        function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
+            const words = text.split(' ');
+            let line = '';
+
+            for (let i = 0; i < words.length; i++) {
+                const testLine = line + words[i] + ' ';
+                const metrics = ctx.measureText(testLine);
+                const testWidth = metrics.width;
+
+                if (testWidth > maxWidth && i > 0) {
+                    ctx.fillText(line, x, y);
+                    line = words[i] + ' ';
+                    y += lineHeight;
+                } else {
+                    line = testLine;
+                }
+            }
+
+            ctx.fillText(line, x, y);
+        }
+    </script>
+</body>
+</html>
