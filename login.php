@@ -76,11 +76,17 @@
         } else {
             $error = '<label for="promter" class="form-label" style="color:rgb(255, 62, 62);text-align:center;">We cant found any acount for this email.</label>';
         }
-    } else {
+    }
+    else
+    {
         $error = '<label for="promter" class="form-label">&nbsp;</label>';
     }
 
     ?>
+
+<div class="homelink" style="position: fixed; top: 20px; right: 10px; z-index: 9999;">
+    <a href="index.html" style="text-decoration: none; color: #fff; font-weight: bold; padding: 10px 20px; background-color: #12ac8e; border: 2px solid #0d846c; border-radius: 5px; text-transform: uppercase; letter-spacing: 1px; transition: all 0.3s ease;">Home</a>
+</div>
 
     <center>
         <div class="container">
